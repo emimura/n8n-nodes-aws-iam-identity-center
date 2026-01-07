@@ -1,0 +1,36 @@
+{
+  "name": "n8n-nodes-aws-iam-identity-center",
+  "version": "1.0.6",
+  "description": "AWS IAM Identity Center node for n8n workflow automation platform",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Everton Mimura <emimura@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emimura/n8n-nodes-aws-iam-identity-center.git"
+  },
+  "keywords": [
+    "n8n",
+    "n8n-community-node-package",
+    "aws",
+    "iam-identity-center",
+    "sso",
+    "users"
+  ],
+  "n8n": {
+    "nodes": [
+      "nodes/AwsIamIdentityCenter/AwsIamIdentityCenter.node.js"
+    ],
+    "credentials": [
+      "credentials/AwsIamIdentityCenterApi.credentials.js"
+    ]
+  },
+  "dependencies": {
+    "@aws-sdk/client-identitystore": "^3.0.0",
+    "@aws-sdk/client-sso-admin": "^3.0.0",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
