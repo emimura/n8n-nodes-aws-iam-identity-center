@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-aws-iam-identity-center",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AWS IAM Identity Center node for n8n workflow automation platform",
   "main": "index.js",
   "license": "MIT",

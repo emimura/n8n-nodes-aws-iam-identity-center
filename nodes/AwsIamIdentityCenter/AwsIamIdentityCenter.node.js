@@ -1,4 +1,4 @@
-const { IdentitystoreClient, ListUsersCommand, DescribeUserCommand, UpdateUserCommand } = require('@aws-sdk/client-identitystore');
+const { IdentitystoreClient, ListUsersCommand, DescribeUserCommand } = require('@aws-sdk/client-identitystore');
 const { SSOAdminClient, ListAccountsForProvisionedPermissionSetCommand } = require('@aws-sdk/client-sso-admin');
 
 class AwsIamIdentityCenter {
@@ -38,26 +38,8 @@ class AwsIamIdentityCenter {
 						{
 							name: 'Get User',
 							value: 'getUser',
-							description: 'Get user details by ID or username',
+							description: 'Get user details by User ID or Username',
 							action: 'Get user details',
-						},
-						{
-							name: 'Update User',
-							value: 'updateUser',
-							description: 'Update user information',
-							action: 'Update user',
-						},
-						{
-							name: 'Disable User',
-							value: 'disableUser',
-							description: 'Disable a user account',
-							action: 'Disable user',
-						},
-						{
-							name: 'Enable User',
-							value: 'enableUser',
-							description: 'Enable a user account',
-							action: 'Enable user',
 						},
 					],
 					default: 'listUsers',
@@ -120,7 +102,7 @@ class AwsIamIdentityCenter {
 					type: 'string',
 					displayOptions: {
 						show: {
-							operation: ['getUser', 'updateUser', 'disableUser', 'enableUser'],
+							operation: ['getUser'],
 							searchBy: ['userId'],
 						},
 					},
@@ -139,75 +121,6 @@ class AwsIamIdentityCenter {
 					},
 					default: '',
 					description: 'The username to search for',
-				},
-				{
-					displayName: 'Email',
-					name: 'email',
-					type: 'string',
-					displayOptions: {
-						show: {
-							operation: ['getUser'],
-							searchBy: ['email'],
-						},
-					},
-					default: '',
-					description: 'The email to search for',
-				},
-				// Update User options
-				{
-					displayName: 'User ID',
-					name: 'userIdUpdate',
-					type: 'string',
-					displayOptions: {
-						show: {
-							operation: ['updateUser', 'disableUser', 'enableUser'],
-						},
-					},
-					default: '',
-					required: true,
-					description: 'The unique identifier for the user to update',
-				},
-				{
-					displayName: 'Update Fields',
-					name: 'updateFields',
-					type: 'collection',
-					placeholder: 'Add Field',
-					displayOptions: {
-						show: {
-							operation: ['updateUser'],
-						},
-					},
-					default: {},
-					options: [
-						{
-							displayName: 'Display Name',
-							name: 'displayName',
-							type: 'string',
-							default: '',
-							description: 'The display name of the user',
-						},
-						{
-							displayName: 'Given Name',
-							name: 'givenName',
-							type: 'string',
-							default: '',
-							description: 'The given name of the user',
-						},
-						{
-							displayName: 'Family Name',
-							name: 'familyName',
-							type: 'string',
-							default: '',
-							description: 'The family name of the user',
-						},
-						{
-							displayName: 'Email',
-							name: 'email',
-							type: 'string',
-							default: '',
-							description: 'The email address of the user',
-						},
-					],
 				},
 			],
 		};
@@ -290,84 +203,6 @@ class AwsIamIdentityCenter {
 							: null;
 					}
 
-				} else if (operation === 'updateUser') {
-					const userId = this.getNodeParameter('userIdUpdate', i);
-					const updateFields = this.getNodeParameter('updateFields', i);
-
-					const operations = [];
-					
-					if (updateFields.displayName) {
-						operations.push({
-							AttributePath: 'DisplayName',
-							AttributeValue: updateFields.displayName,
-						});
-					}
-					
-					if (updateFields.givenName) {
-						operations.push({
-							AttributePath: 'Name.GivenName',
-							AttributeValue: updateFields.givenName,
-						});
-					}
-					
-					if (updateFields.familyName) {
-						operations.push({
-							AttributePath: 'Name.FamilyName',
-							AttributeValue: updateFields.familyName,
-						});
-					}
-					
-					if (updateFields.email) {
-						operations.push({
-							AttributePath: 'Emails.Value',
-							AttributeValue: updateFields.email,
-						});
-					}
-
-					const command = new UpdateUserCommand({
-						IdentityStoreId: identityStoreId,
-						UserId: userId,
-						Operations: operations.map(op => ({
-							AttributePath: op.AttributePath,
-							AttributeValue: op.AttributeValue,
-						})),
-					});
-
-					responseData = await identityStoreClient.send(command);
-
-				} else if (operation === 'disableUser') {
-					const userId = this.getNodeParameter('userIdUpdate', i);
-					
-					const command = new UpdateUserCommand({
-						IdentityStoreId: identityStoreId,
-						UserId: userId,
-						Operations: [
-							{
-								AttributePath: 'Active',
-								AttributeValue: 'false',
-							},
-						],
-					});
-
-					responseData = await identityStoreClient.send(command);
-					responseData.message = 'User disabled successfully';
-
-				} else if (operation === 'enableUser') {
-					const userId = this.getNodeParameter('userIdUpdate', i);
-					
-					const command = new UpdateUserCommand({
-						IdentityStoreId: identityStoreId,
-						UserId: userId,
-						Operations: [
-							{
-								AttributePath: 'Active',
-								AttributeValue: 'true',
-							},
-						],
-					});
-
-					responseData = await identityStoreClient.send(command);
-					responseData.message = 'User enabled successfully';
 				}
 
 				returnData.push({
